@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1565C0">
+<title>Okey 101</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Oswald:wght@500;700&display=swap');
+
+:root {
+  --blue:#1565C0; --blue-light:#1976D2; --blue-pale:#E3F2FD; --blue-mid:#BBDEFB;
+  --blue-dark:#0D47A1; --accent:#FF6F00; --accent-light:#FFF3E0;
+  --red:#C62828; --red-light:#FFEBEE; --green:#2E7D32; --green-light:#E8F5E9;
+  --purple:#7B1FA2; --white:#FFFFFF; --off-white:#F8FBFF;
+  --text:#1A1A2E; --text-light:#546E7A; --border:#CFE4FA;
+  --shadow:0 2px 12px rgba(21,101,192,0.10); --shadow-lg:0 4px 24px rgba(21,101,192,0.18);
+  --radius:14px; --radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+.topbar{background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(13,71,161,0.25)}
+.topbar-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:1px}
+.topbar-title span{color:#FFD54F}
+.tab-bar{background:var(--blue-dark);display:flex}
+.tab-btn{flex:1;background:none;border:none;color:rgba(255,255,255,0.65);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:10px 4px;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;letter-spacing:0.3px}
+.tab-btn.active{color:#FFD54F;border-bottom-color:#FFD54F}
+
+.page{display:none;padding:16px 14px 130px}
+.page.active{display:block}
+
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid var(--border)}
+.card-title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;color:var(--blue);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:4px;height:18px;background:var(--blue);border-radius:2px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;transition:all 0.15s;padding:10px 16px;font-size:14px}
+.btn:active{transform:scale(0.96)}
+.btn-primary{background:var(--blue);color:white}
+.btn-danger{background:var(--red);color:white}
+.btn-success{background:var(--green);color:white}
+.btn-accent{background:var(--accent);color:white}
+.btn-outline{background:white;color:var(--blue);border:2px solid var(--blue)}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn-lg{padding:14px 24px;font-size:16px;width:100%}
+.btn-full{width:100%}
+.btn-grey{background:#ECEFF1;color:var(--text)}
+.btn-purple{background:var(--purple);color:white}
+
+.input-group{margin-bottom:12px}
+.input-group label{display:block;font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+input[type=text],input[type=number],select{width:100%;border:2px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--text);background:white;outline:none;transition:border-color 0.2s}
+input:focus,select:focus{border-color:var(--blue)}
+
+.player-count-btns{display:flex;gap:10px}
+.pcount-btn{flex:1;padding:14px;border-radius:var(--radius-sm);border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--blue-light);cursor:pointer;text-align:center;transition:all 0.15s}
+.pcount-btn.selected{background:var(--blue);color:white;border-color:var(--blue)}
+
+.score-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:0 14px}
+.score-table{width:100%;border-collapse:collapse;min-width:280px}
+.score-table thead th{background:var(--blue);color:white;padding:10px 8px;font-size:13px;font-weight:800;text-align:center}
+.score-table thead th:first-child{background:var(--blue-dark);text-align:left;padding-left:12px;min-width:72px}
+.score-table tbody tr:nth-child(even) td{background:var(--blue-pale)}
+.score-table tbody tr:nth-child(odd) td{background:white}
+.score-table tbody td{padding:8px 6px;text-align:center;font-size:13px;font-weight:600;border-bottom:1px solid var(--border)}
+.score-table tbody td:first-child{text-align:left;padding-left:12px;color:var(--text-light);font-size:12px}
+.score-table tbody td.editable:hover{background:var(--blue-mid)!important;cursor:pointer}
+.score-table .totals-row td{background:var(--blue-dark)!important;color:white;font-weight:800;font-size:14px;padding:10px 6px;border:none}
+.score-table .totals-row td:first-child{text-align:left;padding-left:12px}
+.neg-score{color:var(--green);font-weight:800}
+.pen-score{color:var(--red)}
+.win-cell{color:var(--green);font-weight:900}
+
+.sticky-scores{position:fixed;bottom:0;left:0;right:0;background:var(--blue-dark);padding:10px 14px 14px;z-index:90;box-shadow:0 -4px 20px rgba(13,71,161,0.25)}
+.sticky-scores-inner{display:flex;gap:8px;overflow-x:auto}
+.sticky-player-score{flex:1;min-width:70px;background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;text-align:center;border:1px solid rgba(255,255,255,0.15)}
+.sps-name{font-size:11px;color:rgba(255,255,255,0.7);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sps-score{font-size:20px;font-weight:900;color:white;font-family:'Oswald',sans-serif}
+.leader .sps-score{color:#FFD54F}
+.losing .sps-score{color:#FF8A80}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:white;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 18px 30px;max-height:92vh;overflow-y:auto;animation:slideUp 0.25s ease}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:var(--blue);margin-bottom:16px;text-align:center;letter-spacing:0.5px}
+.modal-sub{font-size:12px;color:var(--text-light);text-align:center;margin:-10px 0 14px}
+
+.player-round-card{border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--off-white)}
+.player-round-card.winner-card{border-color:var(--green);background:var(--green-light)}
+.prc-name{font-weight:800;font-size:15px;color:var(--text);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.round-options{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
+.ropt-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;color:var(--text)}
+.ropt-btn.active-win{background:var(--green);color:white;border-color:var(--green)}
+.ropt-btn.active-noopen{background:var(--purple);color:white;border-color:var(--purple)}
+.ropt-btn.active-cift{background:var(--accent);color:white;border-color:var(--accent)}
+.ropt-btn.active-manual{background:var(--blue);color:white;border-color:var(--blue)}
+.manual-input-wrap{display:none;margin-top:6px}
+.manual-input-wrap.show{display:block}
+
+.ceza-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.ceza-row-label{font-size:12px;font-weight:700;color:var(--red);flex:1}
+.ceza-badge{background:var(--red);color:white;border-radius:20px;padding:2px 12px;font-size:13px;font-weight:900;min-width:30px;text-align:center}
+.ceza-btns{display:flex;gap:6px;align-items:center}
+
+.okey-x2-bar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--accent),#E65100);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:14px;cursor:pointer}
+.ox2-label{color:white;font-weight:900;font-size:16px;font-family:'Oswald',sans-serif;letter-spacing:1px}
+.ox2-sub{color:rgba(255,255,255,0.8);font-size:11px;font-weight:600}
+.toggle-switch{width:50px;height:28px;background:rgba(0,0,0,0.25);border-radius:14px;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-switch.on{background:#FFD54F}
+.toggle-switch::after{content:'';position:absolute;width:22px;height:22px;background:white;border-radius:50%;top:3px;left:3px;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.toggle-switch.on::after{left:25px}
+
+.action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.action-bar .btn{flex:1;min-width:100px}
+
+.archive-item{background:white;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.archive-item:active{box-shadow:var(--shadow-lg)}
+.ai-date{font-size:11px;color:var(--text-light);font-weight:600}
+.ai-players{font-size:14px;font-weight:800;color:var(--text);margin-top:2px}
+.ai-rounds{font-size:12px;color:var(--text-light);margin-top:1px}
+.ai-arrow{color:var(--blue);font-size:20px}
+.ai-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:8px}
+.ai-status.ongoing{background:var(--accent-light);color:var(--accent)}
+.ai-status.done{background:var(--green-light);color:var(--green)}
+
+.empty-state{text-align:center;padding:50px 20px;color:var(--text-light)}
+.empty-state .es-icon{font-size:52px;margin-bottom:14px}
+.empty-state .es-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:800}
+.badge-ceza{background:var(--red);color:white}
+.badge-noopen{background:var(--purple);color:white}
+.badge-cift{background:var(--accent);color:white}
+.badge-x2{background:var(--accent);color:white}
+.round-badge{background:var(--blue-pale);color:var(--blue);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap}
+.round-badge.x2{background:var(--accent-light);color:var(--accent)}
+
+.divider{height:1px;background:var(--border);margin:14px 0}
+.confirm-bar{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.confirm-bar .btn{flex:1}
+
+.round-summary-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.rsn{font-weight:700}
+.rsp{font-weight:800}
+.rsp.negative{color:var(--green)}
+.rsp.penalty{color:var(--red)}
+
+.setup-header{background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-radius:var(--radius);padding:20px;margin-bottom:16px;color:white;text-align:center}
+.setup-header h2{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.setup-header p{font-size:13px;opacity:0.8}
+
+.edit-score-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.esr-name{font-weight:800;font-size:14px;flex:1}
+
+.name-edit-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ne-old{font-size:12px;color:var(--text-light);min-width:75px;font-weight:700}
+
+.no-game-prompt{background:linear-gradient(135deg,var(--blue-pale),var(--blue-mid));border-radius:var(--radius);padding:24px;text-align:center;border:2px dashed var(--blue);margin-bottom:14px}
+.no-game-prompt p{color:var(--blue);font-weight:700;font-size:15px;margin-bottom:14px}
+
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--blue-dark);color:white;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+
+.version-tag{text-align:center;font-size:10px;color:var(--text-light);padding:4px;margin-top:-8px;margin-bottom:8px}
+#archiveModalContent .score-table-wrap{max-height:50vh;overflow-y:auto}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">OKEY <span>101</span></div>
+  <div id="activeGameBadge" style="display:none;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#FFD54F;">● LIVE</div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('game')">🎮 Game</button>
+  <button class="tab-btn" onclick="showTab('setup')">➕ New Game</button>
+  <button class="tab-btn" onclick="showTab('archive')">📁 Archive</button>
+</div>
+
+<!-- ══ GAME PAGE ══ -->
+<div class="page active" id="page-game">
+  <div id="noGameState" class="no-game-prompt">
+    <p>No active game. Start a new game or resume one from the archive.</p>
+    <button class="btn btn-primary" onclick="showTab('setup')">➕ Start New Game</button>
+  </div>
+  <div id="gameContent" style="display:none;">
+    <div class="action-bar" id="mainActionBar">
+      <button class="btn btn-success" onclick="openRoundModal()">🏆 Enter Round</button>
+      <button class="btn btn-outline" onclick="openEditNamesModal()">✏️ Edit Names</button>
+    </div>
+    <div class="okey-x2-bar" onclick="toggleOkeyX2()" id="okeyX2Bar">
+      <div>
+        <div class="ox2-label">🔥 OKEY ×2</div>
+        <div class="ox2-sub" id="ox2Sub">Tap to activate — doubles all scores this round</div>
+      </div>
+      <div class="toggle-switch" id="ox2Toggle"></div>
+    </div>
+    <div class="card" style="padding:14px 0;">
+      <div class="card-title" style="padding:0 14px;">Score Table
+        <span style="font-size:11px;color:var(--text-light);font-weight:600;text-transform:none;letter-spacing:0;font-family:'Nunito',sans-serif;">(tap score to edit)</span>
+      </div>
+      <div class="score-table-wrap">
+        <table class="score-table">
+          <thead id="scoreTableHead"></thead>
+          <tbody id="scoreTableBody"></tbody>
+          <tfoot id="scoreTableFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-full" style="margin-bottom:10px;" onclick="finishGame()">🏁 Finish Game</button>
+  </div>
+</div>
+
+<!-- ══ SETUP PAGE ══ -->
+<div class="page" id="page-setup">
+  <div class="setup-header"><h2>NEW GAME</h2><p>Set up your Okey 101 game</p></div>
+  <div class="card">
+    <div class="card-title">Number of Players</div>
+    <div class="player-count-btns">
+      <button class="pcount-btn" onclick="setPlayerCount(2)">2</button>
+      <button class="pcount-btn selected" onclick="setPlayerCount(3)">3</button>
+      <button class="pcount-btn" onclick="setPlayerCount(4)">4</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Player Names</div>
+    <div id="playerNameInputs" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+  <button class="btn btn-primary btn-lg" onclick="startGame()">Start Game ▶</button>
+  <div class="version-tag">v2.0</div>
+</div>
+
+<!-- ══ ARCHIVE PAGE ══ -->
+<div class="page" id="page-archive">
+  <div class="card-title" style="margin-bottom:10px;">Saved Games</div>
+  <div id="archiveList"></div>
+</div>
+
+<!-- ══ STICKY FOOTER ══ -->
+<div class="sticky-scores" id="stickyScores" style="display:none;">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.5);margin-bottom:6px;">Total Scores</div>
+  <div class="sticky-scores-inner" id="stickyScoresInner"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROUND MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="roundModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="roundModalTitle">Round Entry</div>
+    <p class="modal-sub">Set each player's result. Use + / − to add Ceza penalties within this round.</p>
+    <div id="roundPlayerCards"></div>
+    <div id="roundSummarySection" style="display:none;">
+      <div class="divider"></div>
+      <div class="card-title" style="margin-bottom:10px;">Round Summary</div>
+      <div id="roundSummaryRows"></div>
+    </div>
+    <div class="confirm-bar">
+      <button class="btn btn-grey" onclick="closeModal('roundModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="previewRound()" id="previewRoundBtn">Preview →</button>
+      <button class="btn btn-success" onclick="confirmRound()" id="confirmRoundBtn" style="display:none;">✔ Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     EDIT ROUND MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="editScoreModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editScoreTitle">Edit Round</div>
+    <p class="modal-sub">Adjust scores directly. Negative values are allowed.</p>
+    <div id="editScoreRows"></div>
+    <div class="confirm-bar">
+      <button class="btn btn-grey" onclick="closeModal('editScoreModal')">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteRound()" style="flex:0;white-space:nowrap;">🗑 Delete Round</button>
+      <button class="btn btn-success" onclick="saveEditedRound()">✔ Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     EDIT NAMES MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="editNamesModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Edit Player Names</div>
+    <p class="modal-sub">Names update across the whole game including past rounds.</p>
+    <div id="editNamesRows"></div>
+    <div class="confirm-bar">
+      <button class="btn btn-grey" onclick="closeModal('editNamesModal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveEditedNames()">✔ Save Names</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ARCHIVE VIEW MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="archiveViewModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="archiveModalTitle">Archived Game</div>
+    <div id="archiveModalContent"></div>
+    <div class="confirm-bar" id="archiveModalActions" style="flex-wrap:wrap;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let state = {
+  players: [], rounds: [], okeyX2Active: false,
+  gameId: null, startedAt: null, finished: false
+};
+let playerCount = 3;
+let roundData = {};
+let editingRoundIdx = -1;
+
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+function saveState() {
+  if (!state.gameId) return;
+  const games = getArchive();
+  const idx = games.findIndex(g => g.gameId === state.gameId);
+  const entry = JSON.parse(JSON.stringify(state));
+  if (idx >= 0) games[idx] = entry; else games.unshift(entry);
+  localStorage.setItem('okey101_archive', JSON.stringify(games));
+  if (!state.finished) localStorage.setItem('okey101_active', state.gameId);
+}
+function getArchive() {
+  try { return JSON.parse(localStorage.getItem('okey101_archive') || '[]'); } catch { return []; }
+}
+function loadActiveGame() {
+  const id = localStorage.getItem('okey101_active');
+  if (!id) return false;
+  const g = getArchive().find(g => g.gameId === id);
+  if (!g || g.finished) return false;
+  state = JSON.parse(JSON.stringify(g));
+  return true;
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['game','setup','archive'][i] === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'archive') renderArchive();
+  if (tab === 'game') renderGame();
+}
+
+// ══════════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════════
+function setPlayerCount(n) {
+  playerCount = n;
+  document.querySelectorAll('.pcount-btn').forEach((b,i) => b.classList.toggle('selected', i+2 === n));
+  renderPlayerNameInputs();
+}
+function renderPlayerNameInputs() {
+  const el = document.getElementById('playerNameInputs');
+  const existing = [];
+  el.querySelectorAll('input').forEach(i => existing.push(i.value));
+  el.innerHTML = '';
+  ['Player 1','Player 2','Player 3','Player 4'].slice(0, playerCount).forEach((def,i) => {
+    const d = document.createElement('div');
+    d.className = 'input-group';
+    d.style.marginBottom = '0';
+    d.innerHTML = `<label>Player ${i+1}</label><input type="text" id="pname${i}" value="${existing[i] !== undefined ? existing[i] : def}" placeholder="Enter name">`;
+    el.appendChild(d);
+  });
+}
+function startGame() {
+  const names = [];
+  for (let i = 0; i < playerCount; i++) {
+    const v = (document.getElementById('pname'+i)?.value || '').trim();
+    if (!v) { showToast('Please enter all player names'); return; }
+    names.push(v);
+  }
+  state = { players: names, rounds: [], okeyX2Active: false, gameId: Date.now().toString(), startedAt: new Date().toISOString(), finished: false };
+  saveState();
+  renderGame();
+  showTab('game');
+  showToast('Game started! Good luck 🎲');
+}
+
+// ══════════════════════════════════════════
+// RENDER GAME
+// ══════════════════════════════════════════
+function renderGame() {
+  const has = state.players.length > 0;
+  document.getElementById('noGameState').style.display = has ? 'none' : '';
+  document.getElementById('gameContent').style.display = has ? '' : 'none';
+  document.getElementById('stickyScores').style.display = has ? '' : 'none';
+  document.getElementById('activeGameBadge').style.display = (has && !state.finished) ? '' : 'none';
+  if (!has) return;
+  renderScoreTable();
+  renderStickyScores();
+  document.getElementById('ox2Toggle').classList.toggle('on', state.okeyX2Active);
+  document.getElementById('ox2Sub').textContent = state.okeyX2Active
+    ? '✔ ACTIVE — All scores doubled this round!'
+    : 'Tap to activate — doubles all scores this round';
+  document.getElementById('mainActionBar').style.display = state.finished ? 'none' : '';
+  document.getElementById('okeyX2Bar').style.display = state.finished ? 'none' : '';
+}
+
+function getTotals() {
+  const totals = state.players.map(() => 0);
+  state.rounds.forEach(r => r.scores.forEach((s,i) => totals[i] += s));
+  return totals;
+}
+
+function renderScoreTable() {
+  const head = document.getElementById('scoreTableHead');
+  const body = document.getElementById('scoreTableBody');
+  const foot = document.getElementById('scoreTableFoot');
+
+  head.innerHTML = '<tr><th>Round</th>' + state.players.map(p => `<th>${p}</th>`).join('') + '</tr>';
+
+  if (!state.rounds.length) {
+    body.innerHTML = `<tr><td colspan="${state.players.length+1}" style="text-align:center;color:var(--text-light);padding:22px;font-size:13px;">No rounds yet — tap Enter Round!</td></tr>`;
+  } else {
+    body.innerHTML = state.rounds.map((round, ri) => {
+      const lbl = round.x2
+        ? `<span class="round-badge x2">R${ri+1} ×2</span>`
+        : `<span class="round-badge">R${ri+1}</span>`;
+      const cells = round.scores.map((s, pi) => {
+        const f = round.flags ? round.flags[pi] : 'normal';
+        let cls = s < 0 ? 'neg-score' : (f === 'ceza' ? 'pen-score' : '');
+        if (f === 'win') cls = 'neg-score';
+        let extra = '';
+        const cz = round.cezas ? round.cezas[pi] : 0;
+        if (cz > 0) extra += ` <span class="badge badge-ceza">C×${cz}</span>`;
+        if (f === 'noopen') extra += ` <span class="badge badge-noopen">NO</span>`;
+        if (f === 'cift') extra += ` <span class="badge badge-cift">×2</span>`;
+        const clickAttr = !state.finished ? `class="${cls} editable" onclick="openEditScoreModal(${ri})"` : `class="${cls}"`;
+        return `<td ${clickAttr}>${s}${extra}</td>`;
+      }).join('');
+      return `<tr><td>${lbl}</td>${cells}</tr>`;
+    }).join('');
+  }
+
+  const totals = getTotals();
+  foot.innerHTML = '<tr class="totals-row"><td>TOTAL</td>' + totals.map(t => `<td>${t}</td>`).join('') + '</tr>';
+}
+
+function renderStickyScores() {
+  const totals = getTotals();
+  const min = Math.min(...totals), max = Math.max(...totals);
+  document.getElementById('stickyScoresInner').innerHTML = state.players.map((p,i) => {
+    let cls = '';
+    if (state.rounds.length > 0) { if (totals[i] === min) cls = 'leader'; else if (totals[i] === max) cls = 'losing'; }
+    return `<div class="sticky-player-score ${cls}"><div class="sps-name">${p}</div><div class="sps-score">${totals[i]}</div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// OKEY X2
+// ══════════════════════════════════════════
+function toggleOkeyX2() {
+  if (state.finished) return;
+  state.okeyX2Active = !state.okeyX2Active;
+  document.getElementById('ox2Toggle').classList.toggle('on', state.okeyX2Active);
+  document.getElementById('ox2Sub').textContent = state.okeyX2Active
+    ? '✔ ACTIVE — All scores doubled this round!'
+    : 'Tap to activate — doubles all scores this round';
+  showToast(state.okeyX2Active ? '🔥 OKEY ×2 ACTIVE' : 'OKEY ×2 deactivated');
+  saveState();
+}
+
+// ══════════════════════════════════════════
+// ROUND MODAL — Ceza built-in per player
+// ══════════════════════════════════════════
+function openRoundModal() {
+  roundData = {};
+  state.players.forEach((_,i) => { roundData[i] = { type:'normal', value:0, cezas:0 }; });
+
+  const rn = state.rounds.length + 1;
+  document.getElementById('roundModalTitle').textContent = `Round ${rn}${state.okeyX2Active ? ' 🔥 ×2' : ''}`;
+  document.getElementById('roundSummarySection').style.display = 'none';
+  document.getElementById('previewRoundBtn').style.display = '';
+  document.getElementById('confirmRoundBtn').style.display = 'none';
+
+  document.getElementById('roundPlayerCards').innerHTML = state.players.map((p,i) => `
+    <div class="player-round-card" id="prc_${i}">
+      <div class="prc-name">
+        <span>${p}</span>
+        ${state.okeyX2Active ? '<span style="font-size:11px;background:var(--accent);color:white;border-radius:20px;padding:2px 8px;">×2 ON</span>' : ''}
+      </div>
+      <div class="round-options">
+        <button class="ropt-btn" id="ropt_win_${i}" onclick="setRoundType(${i},'win')">🏆 Won (−101)</button>
+        <button class="ropt-btn" id="ropt_noopen_${i}" onclick="setRoundType(${i},'noopen')">🚫 No Open (202)</button>
+        <button class="ropt-btn" id="ropt_cift_${i}" onclick="setRoundType(${i},'cift')">✌️ Çift ×2</button>
+        <button class="ropt-btn" id="ropt_manual_${i}" onclick="setRoundType(${i},'manual')">✏️ Manual</button>
+      </div>
+      <div class="manual-input-wrap" id="mwrap_${i}">
+        <div class="input-group" style="margin-bottom:0;">
+          <label id="mwraplabel_${i}">Points this round</label>
+          <input type="number" id="manual_${i}" placeholder="e.g. 35" min="0" max="999" oninput="resetPreview()">
+        </div>
+      </div>
+      <div class="ceza-row">
+        <span class="ceza-row-label">⚠️ Ceza (+101 each)</span>
+        <div class="ceza-btns">
+          <button class="btn btn-sm btn-grey" onclick="changeCeza(${i},-1)">−</button>
+          <span class="ceza-badge" id="ceza_badge_${i}">0</span>
+          <button class="btn btn-sm btn-danger" onclick="changeCeza(${i},1)">+101</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('roundModal').classList.add('open');
+}
+
+function changeCeza(idx, delta) {
+  roundData[idx].cezas = Math.max(0, (roundData[idx].cezas || 0) + delta);
+  document.getElementById('ceza_badge_'+idx).textContent = roundData[idx].cezas;
+  resetPreview();
+}
+
+function setRoundType(idx, type) {
+  // Toggle off if same
+  if (roundData[idx].type === type) {
+    roundData[idx].type = 'normal';
+    roundData[idx].value = 0;
+    ['win','noopen','cift','manual'].forEach(t => { const b = document.getElementById(`ropt_${t}_${idx}`); if(b) b.className = 'ropt-btn'; });
+    document.getElementById(`prc_${idx}`).classList.remove('winner-card');
+    document.getElementById(`mwrap_${idx}`).classList.remove('show');
+    resetPreview(); return;
+  }
+  roundData[idx].type = type;
+  ['win','noopen','cift','manual'].forEach(t => { const b = document.getElementById(`ropt_${t}_${idx}`); if(b) b.className = 'ropt-btn'; });
+  const btn = document.getElementById(`ropt_${type}_${idx}`);
+  const cardEl = document.getElementById(`prc_${idx}`);
+  const mwrap = document.getElementById(`mwrap_${idx}`);
+  const mlabel = document.getElementById(`mwraplabel_${idx}`);
+  cardEl.classList.toggle('winner-card', type === 'win');
+  if (type === 'win') btn.className = 'ropt-btn active-win';
+  else if (type === 'noopen') btn.className = 'ropt-btn active-noopen';
+  else if (type === 'cift') { btn.className = 'ropt-btn active-cift'; mlabel.textContent = 'Hand points (will be doubled)'; }
+  else if (type === 'manual') { btn.className = 'ropt-btn active-manual'; mlabel.textContent = 'Points this round'; }
+  mwrap.classList.toggle('show', type === 'cift' || type === 'manual');
+  if (type !== 'cift' && type !== 'manual') { roundData[idx].value = 0; }
+  resetPreview();
+}
+
+function resetPreview() {
+  document.getElementById('roundSummarySection').style.display = 'none';
+  document.getElementById('previewRoundBtn').style.display = '';
+  document.getElementById('confirmRoundBtn').style.display = 'none';
+}
+
+function computeScore(idx) {
+  const d = roundData[idx];
+  const x2 = state.okeyX2Active;
+  const cezaPts = (d.cezas || 0) * 101;
+  let base = 0;
+  if (d.type === 'win') base = -101;
+  else if (d.type === 'noopen') base = 202;
+  else if (d.type === 'cift') {
+    const v = parseInt(document.getElementById(`manual_${idx}`)?.value) || 0;
+    base = v * 2;
+  } else if (d.type === 'manual') {
+    const v = parseInt(document.getElementById(`manual_${idx}`)?.value) || 0;
+    base = v;
+  }
+  const total = base + cezaPts;
+  return x2 ? total * 2 : total;
+}
+
+function previewRound() {
+  let html = '';
+  state.players.forEach((p,i) => {
+    const score = computeScore(i);
+    const d = roundData[i];
+    let desc = d.type === 'win' ? '🏆 Won' : d.type === 'noopen' ? '🚫 No Open' : d.type === 'cift' ? '✌️ Çift ×2' : d.type === 'manual' ? '✏️ Manual' : '— No change';
+    if (d.cezas > 0) desc += ` + ${d.cezas} Ceza (${d.cezas*101}pts)`;
+    if (state.okeyX2Active && (d.type !== 'normal' || d.cezas > 0)) desc += ' [×2]';
+    const cls = score < 0 ? 'negative' : score > 100 ? 'penalty' : '';
+    html += `<div class="round-summary-row">
+      <div><span class="rsn">${p}</span><br><span style="font-size:11px;color:var(--text-light);">${desc}</span></div>
+      <div class="rsp ${cls}">${score > 0 ? '+' : ''}${score}</div>
+    </div>`;
+  });
+  document.getElementById('roundSummaryRows').innerHTML = html;
+  document.getElementById('roundSummarySection').style.display = '';
+  document.getElementById('previewRoundBtn').style.display = 'none';
+  document.getElementById('confirmRoundBtn').style.display = '';
+  document.querySelector('#roundModal .modal').scrollTo({ top: 9999, behavior: 'smooth' });
+}
+
+function confirmRound() {
+  const scores = state.players.map((_,i) => computeScore(i));
+  const flags  = state.players.map((_,i) => roundData[i].type);
+  const cezas  = state.players.map((_,i) => roundData[i].cezas || 0);
+  state.rounds.push({ scores, flags, cezas, x2: state.okeyX2Active });
+  state.okeyX2Active = false; // reset after each round
+  closeModal('roundModal');
+  saveState();
+  renderGame();
+  showToast(`Round ${state.rounds.length} recorded ✔`);
+}
+
+// ══════════════════════════════════════════
+// EDIT ROUND SCORES
+// ══════════════════════════════════════════
+function openEditScoreModal(ri) {
+  if (state.finished) return;
+  editingRoundIdx = ri;
+  const round = state.rounds[ri];
+  document.getElementById('editScoreTitle').textContent = `Edit Round ${ri+1}${round.x2 ? ' (×2)' : ''}`;
+  document.getElementById('editScoreRows').innerHTML = state.players.map((p,i) =>
+    `<div class="edit-score-row">
+      <div class="esr-name">${p}</div>
+      <input type="number" id="escore_${i}" value="${round.scores[i]}" style="width:95px;text-align:center;">
+    </div>`
+  ).join('');
+  document.getElementById('editScoreModal').classList.add('open');
+}
+function saveEditedRound() {
+  const round = state.rounds[editingRoundIdx];
+  state.players.forEach((_,i) => {
+    const v = parseInt(document.getElementById(`escore_${i}`).value);
+    if (!isNaN(v)) round.scores[i] = v;
+  });
+  closeModal('editScoreModal');
+  saveState();
+  renderGame();
+  showToast('Round updated ✔');
+}
+function deleteRound() {
+  if (!confirm(`Delete Round ${editingRoundIdx+1}? This cannot be undone.`)) return;
+  state.rounds.splice(editingRoundIdx, 1);
+  closeModal('editScoreModal');
+  saveState();
+  renderGame();
+  showToast('Round deleted');
+}
+
+// ══════════════════════════════════════════
+// EDIT NAMES
+// ══════════════════════════════════════════
+function openEditNamesModal() {
+  document.getElementById('editNamesRows').innerHTML = state.players.map((p,i) =>
+    `<div class="name-edit-row">
+      <span class="ne-old">${p}</span>
+      <input type="text" id="ename_${i}" value="${p}" placeholder="New name">
+    </div>`
+  ).join('');
+  document.getElementById('editNamesModal').classList.add('open');
+}
+function saveEditedNames() {
+  let changed = false;
+  state.players.forEach((_,i) => {
+    const v = (document.getElementById(`ename_${i}`)?.value || '').trim();
+    if (v && v !== state.players[i]) { state.players[i] = v; changed = true; }
+  });
+  closeModal('editNamesModal');
+  if (changed) { saveState(); renderGame(); showToast('Names updated ✔'); }
+}
+
+// ══════════════════════════════════════════
+// FINISH GAME
+// ══════════════════════════════════════════
+function finishGame() {
+  if (!confirm('Mark this game as finished?')) return;
+  state.finished = true;
+  saveState();
+  localStorage.removeItem('okey101_active');
+  renderGame();
+  showToast('Game finished! View in Archive 📁');
+}
+
+// ══════════════════════════════════════════
+// ARCHIVE
+// ══════════════════════════════════════════
+function renderArchive() {
+  const games = getArchive();
+  const el = document.getElementById('archiveList');
+  if (!games.length) {
+    el.innerHTML = `<div class="empty-state"><div class="es-icon">📋</div><div class="es-title">No games yet</div><div>Start a new game to see it here.</div></div>`;
+    return;
+  }
+  el.innerHTML = games.map(g => {
+    const d = new Date(g.startedAt);
+    const dateStr = d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' });
+    const timeStr = d.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+    const sCls = g.finished ? 'done' : 'ongoing';
+    const sTxt = g.finished ? 'Finished' : 'Ongoing';
+    return `<div class="archive-item" onclick="openArchiveGame('${g.gameId}')">
+      <div>
+        <div class="ai-date">📅 ${dateStr} &nbsp;🕐 ${timeStr}</div>
+        <div class="ai-players">${g.players.join(' · ')}</div>
+        <div class="ai-rounds">${g.rounds.length} round${g.rounds.length!==1?'s':''}</div>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <span class="ai-status ${sCls}">${sTxt}</span>
+        <div class="ai-arrow">›</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openArchiveGame(gameId) {
+  const game = getArchive().find(g => g.gameId === gameId);
+  if (!game) return;
+
+  const d = new Date(game.startedAt);
+  const dateStr = d.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  const timeStr = d.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+
+  document.getElementById('archiveModalTitle').textContent = game.players.join(' · ');
+
+  const totals = game.players.map(()=>0);
+  game.rounds.forEach(r => r.scores.forEach((s,i) => totals[i] += s));
+
+  let content = `<p style="font-size:12px;color:var(--text-light);text-align:center;margin-bottom:12px;">📅 ${dateStr} &nbsp;·&nbsp; 🕐 ${timeStr}</p>`;
+  content += `<div class="score-table-wrap"><table class="score-table">
+    <thead><tr><th>Rnd</th>${game.players.map(p=>`<th>${p}</th>`).join('')}</tr></thead>
+    <tbody>`;
+  game.rounds.forEach((r,ri) => {
+    const lbl = r.x2 ? `<span class="round-badge x2">R${ri+1}×2</span>` : `<span class="round-badge">R${ri+1}</span>`;
+    content += `<tr><td>${lbl}</td>`;
+    r.scores.forEach((s,pi) => {
+      const cls = s < 0 ? 'neg-score' : '';
+      const cz = r.cezas && r.cezas[pi] > 0 ? ` <span class="badge badge-ceza">C×${r.cezas[pi]}</span>` : '';
+      const f = r.flags ? r.flags[pi] : '';
+      const noOpen = f === 'noopen' ? ` <span class="badge badge-noopen">NO</span>` : '';
+      const cift = f === 'cift' ? ` <span class="badge badge-cift">×2</span>` : '';
+      content += `<td class="${cls}">${s}${cz}${noOpen}${cift}</td>`;
+    });
+    content += '</tr>';
+  });
+  content += `</tbody>
+    <tfoot><tr class="totals-row"><td>TOTAL</td>${totals.map(t=>`<td>${t}</td>`).join('')}</tr></tfoot>
+  </table></div>`;
+
+  document.getElementById('archiveModalContent').innerHTML = content;
+
+  // Actions: Continue always available (even finished), Copy, Delete
+  document.getElementById('archiveModalActions').innerHTML = `
+    <button class="btn btn-grey" onclick="closeModal('archiveViewModal')" style="flex:0;padding:10px 14px;">✕</button>
+    <button class="btn btn-primary" onclick="continueGame('${game.gameId}')">▶ Continue</button>
+    <button class="btn btn-accent" onclick="copyGame('${game.gameId}')">📋 Copy</button>
+    <button class="btn btn-danger" onclick="deleteGame('${game.gameId}')" style="flex:0;padding:10px 14px;">🗑</button>`;
+
+  document.getElementById('archiveViewModal').classList.add('open');
+}
+
+function continueGame(gameId) {
+  const game = getArchive().find(g => g.gameId === gameId);
+  if (!game) return;
+  state = JSON.parse(JSON.stringify(game));
+  state.finished = false; // allow continuing finished games
+  saveState();
+  localStorage.setItem('okey101_active', state.gameId);
+  closeModal('archiveViewModal');
+  renderGame();
+  showTab('game');
+  showToast('Game resumed — let\'s go! 🎲');
+}
+
+function copyGame(gameId) {
+  const game = getArchive().find(g => g.gameId === gameId);
+  if (!game) return;
+  if (!confirm(`Start a fresh game with the same players (${game.players.join(', ')})?`)) return;
+  state = {
+    players: [...game.players],
+    rounds: [],
+    okeyX2Active: false,
+    gameId: Date.now().toString(),
+    startedAt: new Date().toISOString(),
+    finished: false
+  };
+  saveState();
+  localStorage.setItem('okey101_active', state.gameId);
+  closeModal('archiveViewModal');
+  renderGame();
+  showTab('game');
+  showToast('New game started with same players 🎲');
+}
+
+function deleteGame(gameId) {
+  if (!confirm('Delete this game permanently?')) return;
+  const games = getArchive().filter(g => g.gameId !== gameId);
+  localStorage.setItem('okey101_archive', JSON.stringify(games));
+  if (state.gameId === gameId) {
+    state = { players:[], rounds:[], okeyX2Active:false, gameId:null, startedAt:null, finished:false };
+    localStorage.removeItem('okey101_active');
+    renderGame();
+  }
+  closeModal('archiveViewModal');
+  renderArchive();
+  showToast('Game deleted');
+}
+
+// ══════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); })
+);
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+setPlayerCount(3);
+loadActiveGame();
+renderGame();
+</script>
+</body>
+</html>
